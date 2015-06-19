@@ -165,11 +165,33 @@ IF(OpenMVG_USE_OPENCV)
     MESSAGE(STATUS "WARNING: OpenCV was not found. ")
   ELSE(NOT OpenCV_FOUND)
 
+    FIND_PACKAGE(Torch)
+    IF(DEFINED Torch_INSTALL_INCLUDE)
+      SET(THC_INSTALL_INCLUDE ${Torch_INSTALL_INCLUDE})
+      SET(TH_INSTALL_INCLUDE ${Torch_INSTALL_INCLUDE})
+      SET(TH_INSTALL_LIB ${Torch_INSTALL_LIB})
+      SET(THC_INSTALL_LIB ${Torch_INSTALL_LIB})
+    ENDIF()
+
+    INCLUDE_DIRECTORIES(
+      "/opt/projects/cvpr15matcher/cunnproduction"
+      "/opt/projects/cvpr15matcher/src"
+      ${THC_INSTALL_INCLUDE}/THC
+      ${THC_INSTALL_INCLUDE}
+      ${TH_INSTALL_INCLUDE}/TH
+      ${TH_INSTALL_INCLUDE}
+      ${CUDA_INCLUDE_DIRS}
+    )
+    LINK_DIRECTORIES(
+      "/opt/projects/cvpr15matcher/build/"
+      "/opt/projects/cvpr15matcher/build/cunnproduction"
+    )
+
     ADD_EXECUTABLE(openMVG_main_ComputeFeatures_OpenCV
       main_ComputeFeatures_OpenCV.cpp)
     TARGET_LINK_LIBRARIES(openMVG_main_ComputeFeatures_OpenCV
                           ${OpenMVG_LIBRARIES}
-                          ${OpenCV_LIBS})
+                          ${OpenCV_LIBS} cunn loader_static cunnproduction_static)
 
     SET_PROPERTY(TARGET openMVG_main_ComputeFeatures_OpenCV PROPERTY FOLDER OpenMVG/software)
     INSTALL(TARGETS openMVG_main_ComputeFeatures_OpenCV DESTINATION bin/)
